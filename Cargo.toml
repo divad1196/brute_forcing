@@ -1,7 +1,12 @@
 [package]
 name = "brute_forcing"
+description = "Library to easily loop over values using brute-force"
+license-file = "LICENSE"
 version = "0.1.0"
 edition = "2021"
+homepage = "https://github.com/divad1196/brute_forcing"
+repository = "https://github.com/divad1196/brute_forcing"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
