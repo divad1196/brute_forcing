@@ -10,5 +10,9 @@ readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+path = "src/lib.rs"
+crate-type = ["lib"]
+
 [dependencies]
 rayon = "1.5.3"
