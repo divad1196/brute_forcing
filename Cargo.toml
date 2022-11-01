@@ -2,7 +2,7 @@
 name = "brute_forcing"
 description = "Library to easily loop over values using brute-force"
 license-file = "LICENSE"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 homepage = "https://github.com/divad1196/brute_forcing"
 repository = "https://github.com/divad1196/brute_forcing"
