@@ -1,6 +1,5 @@
 use rayon::{prelude::*, iter::plumbing::UnindexedConsumer};
 use anyhow::{anyhow, Result};
-use std::mem;
 
 fn n_to_vec(n: usize, base: usize) -> Option<Vec<usize>> {
     if base == 0 {
@@ -43,25 +42,17 @@ fn add_vec(dest: &mut Vec<usize>, other: &Vec<usize>, base: usize) {
     }
 }
 
-/*
-pub struct Base {
-    inner: Vec<usize>,
-    base: usize,
-}
-impl Base {
-    fn new(n: usize, base: usize) -> Option<Base> {
-        match n_to_vec(n, base) {
-            Some(vec) => Some(
-                Base{
-                    inner: vec,
-                    base: base
-                }
-            ),
-            None => None,
-        }
+
+pub struct BruteForceValue(Vec<usize>);
+
+impl BruteForceValue {
+    pub fn get(&self) -> &Vec<usize> {
+        &self.0
+    }
+    pub fn with_charset(&self, charset: &str) -> String {
+        convert_vec(&self.0, &charset)
     }
 }
-*/
 
 pub struct BruteForce {
     current: Vec<usize>,
@@ -75,7 +66,7 @@ impl BruteForce {
             size,
         }
     }
-    pub fn chunks(mut self, count: usize, size: usize) -> Result<Vec<BruteForceChunk>> {
+    pub fn chunk_vec(mut self, count: usize, size: usize) -> Result<Vec<BruteForceChunk>> {
         if count < 2 {
             return Err(anyhow!("Count must be greater than 2"));
         }
@@ -90,7 +81,7 @@ impl BruteForce {
             vec.push(
                 BruteForceChunk {
                     bf: BruteForce {
-                        current: self.next().unwrap(),
+                        current: self.next().unwrap().0,
                         size: self.size
                     },
                     size,
@@ -102,19 +93,22 @@ impl BruteForce {
         }
         Ok(vec)
     }
+    pub fn chunks(self, count: usize, size: usize) -> Result<BruteForcePool> {
+        Ok(BruteForcePool(self.chunk_vec(count, size)?))
+    }
     pub fn with_charset(&self, charset: &str) -> String {
         convert_vec(&self.current, &charset)
     }
 }
 impl Iterator for BruteForce {
-    type Item = Vec<usize>;
+    type Item = BruteForceValue;
 
      fn next(&mut self) -> Option<Self::Item> {
         let mut i = 0;
         loop {
             if self.current.len() == i {
                 self.current.push(0);
-                return Some(self.current.clone());
+                return Some(BruteForceValue(self.current.clone()));
             }
             let x = self.current[i]
                 .checked_add(1)
@@ -126,14 +120,14 @@ impl Iterator for BruteForce {
             }
             i += 1;
         }
-        Some(self.current.clone())
+        Some(BruteForceValue(self.current.clone()))
     }
 
     // Documentation: override nth instead of "skip"
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
         let to_add = n_to_vec(n, self.size).unwrap();
         add_vec(&mut self.current, &to_add, self.size);
-        Some(self.current.clone())
+        Some(BruteForceValue(self.current.clone()))
     }
     /* Experimental
     fn advance_by(&mut self, n: usize) -> Result<(), usize> {
@@ -146,6 +140,8 @@ pub struct BruteForceChunk {
     count: usize, // Number of chunks
     index: usize,
 }
+
+pub struct BruteForcePool(Vec<BruteForceChunk>);
 
 impl BruteForceChunk {
     pub fn with_charset(&self, charset: &str) -> String {
@@ -170,7 +166,7 @@ impl Clone for BruteForceChunk {
 }
 
 impl Iterator for BruteForceChunk {
-    type Item = Vec<usize>;
+    type Item = BruteForceValue;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.size {
@@ -245,9 +241,9 @@ impl Iterator for StringBruteForce {
     fn next(&mut self) -> Option<Self::Item> {
         self.brute_force
             .next()
-            .map(|res| convert_vec(&res, &self.charset))
+            .map(|res| convert_vec(&res.0, &self.charset))
     }
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.brute_force.nth(n).map(|res| convert_vec(&res, &self.charset))
+        self.brute_force.nth(n).map(|res| convert_vec(&res.0, &self.charset))
     }
 }

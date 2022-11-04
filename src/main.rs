@@ -13,7 +13,7 @@ fn main() {
     let CHUNK_SIZE = 500usize;
     let charset = "abcdefghijklmnopqrstuvwxyz";
     let charset_size = charset.chars().count();
-    let res = BruteForce::new(charset_size).chunks(5, CHUNK_SIZE);
+    let res = BruteForce::new(charset_size).chunk_vec(5, CHUNK_SIZE);
     if let Err(e) = res {
         eprintln!("{}", e);
         return;
@@ -31,8 +31,11 @@ fn main() {
     }*/
 
     chunks.par_iter_mut().enumerate().for_each(|(i, c)| {
-        c.for_each(|value| {
-            println!("Chunk {}: {}", i, convert_vec(&value, charset))
+        c.map(|value| {
+            value.with_charset(charset)
+        }).take_while(|s| s.len() < 5)
+        .for_each(|value| {
+            println!("Chunk {}: {}", i, value)
         })
     })
 }
