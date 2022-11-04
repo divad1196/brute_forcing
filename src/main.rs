@@ -30,12 +30,30 @@ fn main() {
         println!("{:?}", value);
     }*/
 
-    chunks.par_iter_mut().enumerate().for_each(|(i, c)| {
+    /*chunks.par_iter_mut().enumerate().for_each(|(i, c)| {
         c.map(|value| {
             value.with_charset(charset)
         }).take_while(|s| s.len() < 5)
         .for_each(|value| {
             println!("Chunk {}: {}", i, value)
         })
-    })
+    })*/
+    let res= chunks.par_iter_mut()
+        .enumerate()
+        .find_map_first(|(i, c)| {
+            let res = c.map(
+                |v| v.with_charset(charset))
+            .take_while(|s| s.len() < 5)
+            .find(|s| {
+                if s.eq("test") {
+                    println!("Chunk {}: {}", i, s);
+                }
+                s.eq("test")
+            });
+            match res {
+                Some(s) => Some((i, s)),
+                None => None,
+            }
+        });
+    println!("Found: {:?}", res);
 }
