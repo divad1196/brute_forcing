@@ -16,3 +16,4 @@ crate-type = ["lib"]
 
 [dependencies]
 rayon = "1.5.3"
+anyhow = "1.0.66"
