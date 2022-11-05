@@ -45,11 +45,10 @@ fn add_vec(dest: &mut Vec<usize>, other: &Vec<usize>, base: usize) {
 pub struct BruteForceValue(Vec<usize>);
 
 impl BruteForceValue {
-    #[allow(unused)]
     pub fn get(&self) -> &Vec<usize> {
         &self.0
     }
-    #[allow(unused)]
+
     pub fn with_charset(&self, charset: &str) -> String {
         convert_vec(&self.0, &charset)
     }
@@ -62,14 +61,13 @@ pub struct BruteForce {
 }
 
 impl BruteForce {
-    #[allow(unused)]
     pub fn new(base: usize) -> BruteForce {
         BruteForce {
             current: Vec::new(),
             base,
         }
     }
-    #[allow(unused)]
+
     pub fn chunk_vec(mut self, count: usize, size: usize) -> Result<Vec<BruteForceChunk>> {
         if count < 1 {
             return Err(anyhow!("Count must be non null"));
@@ -95,12 +93,10 @@ impl BruteForce {
         Ok(vec)
     }
 
-    #[allow(unused)]
     pub fn chunks(self, count: usize, size: usize) -> Result<BruteForcePool> {
         Ok(BruteForcePool(self.chunk_vec(count, size)?))
     }
 
-    #[allow(unused)]
     pub fn with_charset(&self, charset: &str) -> String {
         convert_vec(&self.current, &charset)
     }
@@ -135,9 +131,6 @@ impl Iterator for BruteForce {
         add_vec(&mut self.current, &to_add, self.base);
         Some(BruteForceValue(self.current.clone()))
     }
-    /* Experimental
-    fn advance_by(&mut self, n: usize) -> Result<(), usize> {
-    }*/
 }
 
 #[derive(Debug)]
@@ -151,7 +144,6 @@ pub struct BruteForceChunk {
 pub struct BruteForcePool(Vec<BruteForceChunk>);
 
 impl BruteForceChunk {
-    #[allow(unused)]
     pub fn with_charset(&self, charset: &str) -> String {
         self.bf.with_charset(charset)
     }
@@ -204,7 +196,6 @@ pub fn convert_vec(vec: &Vec<usize>, charset: &str) -> String {
 }
 
 impl StringBruteForce {
-    #[allow(unused)]
     pub fn new(charset: &str) -> StringBruteForce {
         StringBruteForce {
             brute_force: BruteForce {
@@ -215,7 +206,6 @@ impl StringBruteForce {
         }
     }
 
-    #[allow(unused)]
     pub fn convert(&self) -> String {
         convert_vec(&self.brute_force.current, &self.charset)
     }
